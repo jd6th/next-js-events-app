@@ -6,13 +6,15 @@ import { Fragment, useEffect, useState } from "react";
 import Button from "../../components/events/ui/Button";
 import ErrorAlert from "../../components/events/ui/error-alert";
 import useSWR from 'swr';
+import Head from "next/head";
 
 function FilteredEventsPage(props) {
     const [loadedEvents, setLoadedEvents] = useState();
     const router = useRouter();
     const filterData = router.query.slug;
 
-    const {data, error} = useSWR('https://events-app-1c2fb-default-rtdb.asia-southeast1.firebasedatabase.app/events.json');
+    const {data, error} = useSWR('https://events-app-1c2fb-default-rtdb.asia-southeast1.firebasedatabase.app/events.json',
+                                    (url) => fetch(url).then(res => res.json()));
 
     useEffect(() => {
         if(data) {
@@ -29,10 +31,17 @@ function FilteredEventsPage(props) {
         }
     }, [data])
 
+    let pageHeadData = (
+        <Head>
+            <title>Filtered Events</title>
+            <meta name="description" content="a list of filtered events" />
+        </Head>
+    );
 
     if(!loadedEvents) {
         return (
             <Fragment>
+                {pageHeadData}
                 <ErrorAlert><p>No data found</p></ErrorAlert>
                 <div className="center">
                     <Button link="/events">Show All Events</Button>
@@ -41,11 +50,19 @@ function FilteredEventsPage(props) {
         )
     }
 
+
     const filteredYear = filterData[0];
     const filteredMonth = filterData[1];
 
     const numYear = +filteredYear;
     const numMonth = +filteredMonth;
+
+    pageHeadData = (
+        <Head>
+            <title>Filtered Events</title>
+            <meta name="description" content={`All events for ${numMonth}/${numYear}.`} />
+        </Head>
+    );
 
     if(
         isNaN(numYear) || 
@@ -58,6 +75,7 @@ function FilteredEventsPage(props) {
     ){
         return (
             <Fragment>
+                {pageHeadData}
                 <ErrorAlert><p>Invalid filter. Please adjust your values!</p></ErrorAlert>
                 <div className="center">
                     <Button link="/events">Show All Events</Button>
@@ -74,6 +92,7 @@ function FilteredEventsPage(props) {
     if(!filteredEvents || filteredEvents.length === 0) {
         return (
             <Fragment>
+                {pageHeadData}
                 <ErrorAlert><p>No events found!</p></ErrorAlert>
                 <div className="center">
                     <Button link="/events">Show All Events</Button>
@@ -86,6 +105,7 @@ function FilteredEventsPage(props) {
 
     return (
         <Fragment>
+            {pageHeadData}
             <ResultsTitle date={date} />
             <EventsList items={filteredEvents} />
         </Fragment>

@@ -5,6 +5,7 @@ import EventLogistics from "../../components/event-detail/event-logistics";
 import EventContent from "../../components/event-detail/event-content";
 import ErrorAlert from "../../components/events/ui/error-alert";
 import EventSummary from "../../components/event-detail/event-summary";
+import Head from "next/head";
 
 function EventDetailPage(props) {
     const router = useRouter();
@@ -19,10 +20,14 @@ function EventDetailPage(props) {
 
     return (
         <Fragment>
+            <Head>
+                <title>{event.title}</title>
+                <meta name="description" content={event.description} />
+            </Head>
             <EventSummary title={event.title} />
             <EventLogistics 
                 date={event.date} 
-                address={event.location} 
+                address={event.location}
                 image={event.image} 
                 imageAlt={event.title}
             />
